@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐥 ﾕﾉﾁｬﾝ 管理画面</title>
+  <style>
+    :root {
+      --bg:        #f5f6f8;
+      --surface:   #ffffff;
+      --border:    #e2e5eb;
+      --text:      #1a1d23;
+      --muted:     #6b7280;
+      --accent:    #3b9edb;
+      --accent-lt: #ebf5fc;
+      --danger:    #e05252;
+      --success:   #34a853;
+      --radius:    10px;
+      --shadow:    0 1px 4px rgba(0,0,0,.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    #toast { display: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    #toast.ok  { background: #d4f0e0; color: #1a7a42; display: inline-block; }
+    #toast.err { background: #fde8e8; color: #a02020; display: inline-block; }
+
+    .layout { display: flex; min-height: calc(100vh - 56px); }
+
+    nav {
+      width: 210px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 500;
+      transition: background .15s, color .15s;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+    nav a:hover  { background: var(--accent-lt); color: var(--accent); }
+    nav a.active { background: var(--accent-lt); color: var(--accent); border-left-color: var(--accent); }
+
+    main { flex: 1; padding: 28px 32px; max-width: 860px; }
+
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
+    input[type=text], input[type=number], input[type=password], textarea, select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #fff;
+      transition: border-color .15s;
+      color: var(--text);
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,158,219,.12);
+    }
+    textarea { resize: vertical; min-height: 72px; }
+    .field { margin-bottom: 12px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    button {
+      cursor: pointer; border: none; border-radius: 6px;
+      font-size: 13px; font-family: inherit; font-weight: 600;
+      padding: 7px 14px; transition: opacity .15s;
+    }
+    button:hover { opacity: .85; }
+    .btn-primary   { background: var(--accent);  color: #fff; }
+    .btn-secondary { background: var(--border);  color: var(--text); }
+    .btn-danger    { background: var(--danger);  color: #fff; }
+    .btn-sm        { padding: 4px 10px; font-size: 12px; }
+    .btn-row       { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+    /* タグ入力 */
+    .tags-wrap {
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 6px 8px; display: flex; flex-wrap: wrap; gap: 4px;
+      min-height: 38px; background: #fff; cursor: text;
+    }
+    .tags-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,158,219,.12); }
+    .tag {
+      background: var(--accent-lt); color: var(--accent);
+      border-radius: 4px; padding: 2px 8px; font-size: 12px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .tag-del { cursor: pointer; font-size: 14px; line-height: 1; color: #999; }
+    .tag-del:hover { color: var(--danger); }
+    .tag-input {
+      border: none !important; padding: 2px 4px !important;
+      font-size: 13px; flex: 1; min-width: 80px; box-shadow: none !important;
+    }
+
+    /* メンバーカード */
+    .member-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 12px;
+    }
+    .member-head {
+      padding: 10px 14px; display: flex; align-items: center;
+      justify-content: space-between; cursor: pointer; user-select: none; gap: 8px;
+    }
+    .member-head:hover { background: #fafbfc; }
+    .member-title { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .member-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .badge-child  { background: #fff3e0; color: #e65100; }
+    .badge-family { background: #e8f5e9; color: #2e7d32; }
+    .badge-friend { background: #f3e5f5; color: #6a1b9a; }
+    .member-body { padding: 14px 16px; border-top: 1px solid var(--border); display: none; }
+    .member-body.open { display: block; }
+    .chevron { transition: transform .2s; font-size: 12px; color: var(--muted); }
+    .chevron.open { transform: rotate(180deg); }
+
+    .section-label {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      letter-spacing: .06em; text-transform: uppercase; margin: 20px 0 8px;
+    }
+    .section-label:first-child { margin-top: 0; }
+
+    /* envグループ */
+    .env-group { margin-bottom: 24px; }
+    .env-group-title {
+      font-size: 13px; font-weight: 700; margin-bottom: 12px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+
+    /* 定時コールカード */
+    .ann-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      margin-bottom: 12px; padding: 14px 16px;
+    }
+    .ann-card-head {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
+    }
+    .ann-time-badge {
+      background: var(--accent-lt); color: var(--accent);
+      border-radius: 6px; padding: 3px 10px; font-size: 13px; font-weight: 700;
+    }
+    .ann-flags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .ann-flag {
+      font-size: 12px; padding: 3px 8px; border-radius: 4px;
+      border: 1px solid var(--border); cursor: pointer; user-select: none;
+      background: #fff; color: var(--muted); transition: all .15s;
+    }
+    .ann-flag.on { background: var(--accent-lt); color: var(--accent); border-color: var(--accent); }
+
+    /* 読み上げ辞書テーブル */
+    .dict-table {
+      width: 100%; border-collapse: collapse; background: var(--surface);
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+    }
+    .dict-table th {
+      background: #fafbfc; padding: 10px 14px; font-size: 12px;
+      color: var(--muted); font-weight: 700; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .dict-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .dict-table tr:last-child td { border-bottom: none; }
+    .dict-table input[type=text] { padding: 5px 8px; font-size: 13px; }
+
+    /* andy.json カード */
+    .andy-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      margin-bottom: 24px; overflow: hidden;
+    }
+    .andy-section-title {
+      padding: 10px 16px; background: #fafbfc;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px; font-weight: 700;
+    }
+    .andy-section-body { padding: 16px; }
+
+    .skeleton {
+      background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+      background-size: 200% 100%; animation: shimmer 1.2s infinite;
+      border-radius: 4px; height: 14px; margin: 8px 0;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span>🐥</span> ﾕﾉﾁｬﾝ 管理画面</div>
+  <span id="toast"></span>
+</header>
+
+<div class="layout">
+  <nav>
+    <a class="active" data-page="reading"      onclick="showPage('reading', this)">📖 読み上げ辞書</a>
+    <a               data-page="announcements" onclick="showPage('announcements', this)">📣 定時コール</a>
+    <a               data-page="member"        onclick="showPage('member', this)">👨‍👩‍👧 メンバー</a>
+    <a               data-page="ai"            onclick="showPage('ai', this)">🤖 AI設定</a>
+    <a               data-page="andy"          onclick="showPage('andy', this)">⛏️ Mindcraft / アンディ</a>
+    <a               data-page="env"           onclick="showPage('env', this)">⚙️ 設定</a>
+  </nav>
+
+  <main>
+
+    <!-- ========== 読み上げ辞書 ========== -->
+    <div id="page-reading" class="page active">
+      <h2>📖 読み上げ辞書</h2>
+      <p style="margin-bottom:16px; color:var(--muted); font-size:13px;">
+        VOICEVOXが誤読する単語を登録します。登録した読みに置き換えてから読み上げます。
+      </p>
+      <div id="reading-loading"><div class="skeleton"></div></div>
+      <div id="reading-content" style="display:none">
+        <table class="dict-table">
+          <thead>
+            <tr>
+              <th style="width:40%">単語（元の表記）</th>
+              <th style="width:40%">読み（ひらがな）</th>
+              <th style="width:20%"></th>
+            </tr>
+          </thead>
+          <tbody id="reading-tbody"></tbody>
+        </table>
+        <div style="margin-top:10px;">
+          <button class="btn-secondary" onclick="addReadingRow()">＋ 追加</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="loadReading()">🔄 リセット</button>
+        <button class="btn-primary"   onclick="saveReading()">💾 保存する</button>
+      </div>
+    </div>
+
+    <!-- ========== 定時コール ========== -->
+    <div id="page-announcements" class="page">
+      <h2>📣 定時コール</h2>
+      <div id="ann-loading"><div class="skeleton"></div></div>
+      <div id="ann-content" style="display:none"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="addAnnouncement()">＋ 追加</button>
+        <button class="btn-secondary" onclick="loadAnnouncements()">🔄 リセット</button>
+        <button class="btn-primary"   onclick="saveAnnouncements()">💾 保存する</button>
+      </div>
+    </div>
+
+    <!-- ========== メンバー ========== -->
+    <div id="page-member" class="page">
+      <h2>👨‍👩‍👧 メンバーの編集</h2>
+      <div id="member-loading"><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>
+      <div id="member-content" style="display:none"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="loadMember()">🔄 リセット</button>
+        <button class="btn-primary"   onclick="saveMember()">💾 保存する</button>
+      </div>
+    </div>
+
+    <!-- ========== AI設定 ========== -->
+    <div id="page-ai" class="page">
+      <h2>🤖 AI設定</h2>
+      <p style="margin-bottom:20px; color:var(--muted); font-size:13px;">
+        変更後は <strong>保存する</strong> をクリック。反映には <strong>サーバー再起動</strong> が必要です。
+      </p>
+      <div id="ai-loading"><div class="skeleton"></div><div class="skeleton" style="width:60%"></div></div>
+      <div id="ai-content" style="display:none"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="loadAiEnv()">🔄 リセット</button>
+        <button class="btn-primary"   onclick="saveAiEnv()">💾 保存する</button>
+      </div>
+    </div>
+
+    <!-- ========== Mindcraft / アンディ ========== -->
+    <div id="page-andy" class="page">
+      <h2>⛏️ Mindcraft / アンディ</h2>
+      <div id="andy-loading"><div class="skeleton"></div></div>
+      <div id="andy-content" style="display:none">
+        <div class="andy-section">
+          <div class="andy-section-title">🧱 Mindcraft設定ファイル（andy.json）</div>
+          <div class="andy-section-body">
+            <div class="grid-2">
+              <div class="field">
+                <label>エージェント名</label>
+                <input type="text" id="andy-name">
+              </div>
+              <div class="field">
+                <label>AIモデル</label>
+                <input type="text" id="andy-model">
+              </div>
+              <div class="field">
+                <label>埋め込みAPI</label>
+                <input type="text" id="andy-embed-api">
+              </div>
+              <div class="field">
+                <label>埋め込みモデル</label>
+                <input type="text" id="andy-embed-model">
+              </div>
+            </div>
+            <div class="field">
+              <label>speak（音声設定 / アンディの声（Kokoro）と同一名にしてください）</label>
+              <input type="text" id="andy-speak" placeholder="yuno/kokoro/am_adam">
+            </div>
+          </div>
+        </div>
+        <div id="andy-env-content"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="loadAndy()">🔄 リセット</button>
+        <button class="btn-primary"   onclick="saveAndy()">💾 保存する</button>
+      </div>
+    </div>
+
+    <!-- ========== 設定（.env） ========== -->
+    <div id="page-env" class="page">
+      <h2>⚙️ 設定（.env）</h2>
+      <p style="margin-bottom:20px; color:var(--muted); font-size:13px;">
+        変更後は <strong>保存する</strong> をクリック。反映には <strong>サーバー再起動</strong> が必要です。
+      </p>
+      <div id="env-loading"><div class="skeleton"></div><div class="skeleton" style="width:60%"></div></div>
+      <div id="env-content" style="display:none"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="loadEnv()">🔄 リセット</button>
+        <button class="btn-primary"   onclick="saveEnv()">💾 保存する</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- utils.js を最初に読み込む（他のJSが依存するため） -->
+<script src="/static/admin/js/utils.js"></script>
+<script src="/static/admin/js/reading.js"></script>
+<script src="/static/admin/js/announcements.js"></script>
+<script src="/static/admin/js/member.js"></script>
+<script src="/static/admin/js/ai.js"></script>
+<script src="/static/admin/js/andy.js"></script>
+<script src="/static/admin/js/env.js"></script>
+
+<script>
+// ===== 初期ロード =====
+loadReading();
+loadAnnouncements();
+loadMember();
+loadAiEnv();
+loadAndy();
+loadEnv();
+</script>
+</body>
+</html>

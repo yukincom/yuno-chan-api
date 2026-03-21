@@ -1,0 +1,73 @@
+{
+  "children": [
+    {
+      "discord_user_id": "",
+      "interests": [
+        "乳製品",
+        "まいぜんシスターズ",
+        "ヨッシーアイランド",
+        "Minecraft",
+        "信号"
+      ],
+      "line_user_id": "",
+      "name": [
+        "ミノル",
+        "みのる",
+        "minoru",
+        "meal"
+      ],
+      "notes": "2021年生まれ。子供園に通っている。",
+      "speech_patterns": []
+    }
+  ],
+  "family": [
+    {
+      "call": [
+        "お母さん",
+        "おかあさん"
+      ],
+      "discord_user_id": "1356246128298819654",
+      "line_user_id": "Ub63fc1633e9e78ea293cee409518158f",
+      "name": [
+        "ゆき",
+        "ユキ",
+        "Yuki"
+      ],
+      "notes": "在宅ワーカー",
+      "speech_patterns": [
+        "あら",
+        "かしら",
+        " ゆのちゃん",
+        "ユノちゃん",
+        "ミノルちゃん",
+        "みのるちゃん",
+        "けいさん",
+        "ますよ",
+        "ですよ"
+      ]
+    },
+    {
+      "call": [
+        "お父さん",
+        "おとうさん"
+      ],
+      "discord_user_id": "",
+      "line_user_id": "U8182aaacc9d5d186a9e8bd32d6179010",
+      "name": [
+        "けい",
+        "ケイ",
+        "Kei"
+      ],
+      "notes": "会社員",
+      "speech_patterns": [
+        "ゆのくん",
+        "ユノくん"
+      ]
+    }
+  ],
+  "friends": [
+    {
+      "name": "友達の呼び名"
+    }
+  ]
+}
