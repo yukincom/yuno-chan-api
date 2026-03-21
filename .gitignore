@@ -1,0 +1,29 @@
+# 環境変数ファイル
+.env
+.env.local
+.env.*
+!.env.example
+.env.keys
+.venv/
+venv/
+
+# 個人情報ファイル
+member.json
+announcements.json
+songs/ 
+mindcraft/
+static/
+whisper.cpp/
+voice-MCP/
+state/
+
+# キャッシュ
+__pycache__/
+**/*.pyc
+.pyo
+
+# 音声ファイル
+/tmp/voice_gen_store/
+
+# macOS
+.DS_Store
