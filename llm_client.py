@@ -20,6 +20,24 @@ from openai import OpenAI
 load_dotenv()
 load_dotenv(".env.local", override=True)
 
+# ─────────────────────────────────────────────────────────
+# 共通：思考プロセス除去（全プロバイダー適用）
+# ─────────────────────────────────────────────────────────
+def _strip_thinking(text: str) -> str:
+    if not text:
+        return ""
+    # <think>...</think> タグごと除去（多くのモデルで使われる）
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
+    # THINKING_STRIP_PATTERNS で設定したパターン以降を抽出
+    for pattern in config.THINKING_STRIP_PATTERNS:
+        pattern = pattern.strip()
+        if pattern and pattern in text:
+            text = text.split(pattern)[-1].strip()
+            break
+    # マークアップ残骸除去
+    text = re.sub(r'^[\s\*\:]+', '', text).strip()
+    text = re.sub(r'\*+', '', text).strip()
+    return text or "ごめん、うまく答えられなかった！"
 
 # ─────────────────────────────────────────────────────────
 # 外部インターフェース
@@ -75,8 +93,6 @@ def call_summary(prompt: str) -> str:
 # ─────────────────────────────────────────────────────────
 
 def _call_gemini(prompt: str, model: str, temperature: float, use_search: bool) -> str:
-    
-
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     gen_config = types.GenerateContentConfig(
         max_output_tokens=config.AI_MAX_OUTPUT_TOKENS,
@@ -88,8 +104,7 @@ def _call_gemini(prompt: str, model: str, temperature: float, use_search: bool) 
         contents=prompt,
         config=gen_config
     )
-    return response.text.strip()
-
+    return _strip_thinking(response.text.strip()) 
 
 # ─────────────────────────────────────────────────────────
 # OpenAI互換（Grok / Ollama / OpenRouter）
@@ -100,23 +115,19 @@ def _call_openai_compatible(prompt: str, model: str, temperature: float) -> str:
         api_key=os.getenv("OPENAI_API_KEY", "ollama"),
         base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
     )
+    # Qwen3系: /no_think で思考プロセス自体を抑制
+    if any(kw in model.lower() for kw in ["qwen3", "qwen-3"]):
+        prompt = prompt + "\n/no_think"
+
     response = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
         max_tokens=config.AI_MAX_OUTPUT_TOKENS,
         temperature=temperature,
     )
-    text = response.choices[0].message.content.strip()
 
-    # Thinking系モデルの思考プロセスを除去
-    for pattern in config.THINKING_STRIP_PATTERNS:
-        pattern = pattern.strip()
-        if pattern and pattern in text:
-            text = text.split(pattern)[-1].strip()
-            break
+    content = response.choices[0].message.content
+    if not content:
+        content = getattr(response.choices[0].message, 'reasoning_content', '') or ''
 
-    # マークアップ除去
-    text = re.sub(r'^[\s\*\:]+', '', text).strip()
-    text = re.sub(r'\*+', '', text).strip()
-
-    return text
+    return _strip_thinking(content) 
