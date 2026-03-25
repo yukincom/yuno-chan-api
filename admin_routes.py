@@ -233,6 +233,14 @@ AI_ENV_GROUPS = [
             {"key": "SEARCH_KEYWORDS", "label": "検索トリガーワード（カンマ区切り）", "type": "text"},
         ]
     },
+    {
+        "group": "💭 Thinkingモデル設定",
+        "items": [
+            {"key": "THINKING_STRIP_PATTERNS", 
+             "label": "思考プロセス除去ワード（カンマ区切り・複数OK）キーワード以前の文章を除外します。例：FInal Response:,Response:", 
+             "type": "text"},
+        ]
+    },
 ]
 
 # Mindcraft / アンディ専用の env 設定

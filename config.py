@@ -21,6 +21,11 @@ class Config:
 
     SEARCH_KEYWORDS = os.getenv("SEARCH_KEYWORDS", "調べて,しらべて,調査して,ちょうさして,サーチして,さーちして,ぐぐって,ググって").split(",")
     SPEECH_ALLOW_SHORT = os.getenv("SPEECH_ALLOW_SHORT", "はーい,いや,やだ,だめ,ねえ").split(",")
+    
+    THINKING_STRIP_PATTERNS = os.getenv(
+        "THINKING_STRIP_PATTERNS", 
+        "Final Response:,Response:"
+    ).split(",")
 
     # AI出力設定
     AI_MAX_OUTPUT_TOKENS = int(os.getenv("AI_MAX_OUTPUT_TOKENS", "1200"))

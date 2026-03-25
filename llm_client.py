@@ -8,6 +8,7 @@ AI_PROVIDER = gemini（デフォルト）/ openai互換（grok / ollama / openro
 - call_summary() : 要約生成。AI_PROVIDERで切り替え
 """
 import os
+import re
 from dotenv import load_dotenv
 from config import config
 
@@ -95,7 +96,6 @@ def _call_gemini(prompt: str, model: str, temperature: float, use_search: bool) 
 # ─────────────────────────────────────────────────────────
 
 def _call_openai_compatible(prompt: str, model: str, temperature: float) -> str:
-
     client = OpenAI(
         api_key=os.getenv("OPENAI_API_KEY", "ollama"),
         base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
@@ -106,4 +106,17 @@ def _call_openai_compatible(prompt: str, model: str, temperature: float) -> str:
         max_tokens=config.AI_MAX_OUTPUT_TOKENS,
         temperature=temperature,
     )
-    return response.choices[0].message.content.strip()
+    text = response.choices[0].message.content.strip()
+
+    # Thinking系モデルの思考プロセスを除去
+    for pattern in config.THINKING_STRIP_PATTERNS:
+        pattern = pattern.strip()
+        if pattern and pattern in text:
+            text = text.split(pattern)[-1].strip()
+            break
+
+    # マークアップ除去
+    text = re.sub(r'^[\s\*\:]+', '', text).strip()
+    text = re.sub(r'\*+', '', text).strip()
+
+    return text

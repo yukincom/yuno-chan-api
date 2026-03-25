@@ -18,7 +18,14 @@ class SpeechService:
             lang = language_code.split("-")[0]
 
             # WAVを一時保存（M5Stackが16kHzで録音するのでそのまま使う）
-            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:#
+#            import datetime #デバッグ
+#            debug_dir = "/tmp/yuno_debug"#デバッグ
+#            os.makedirs(debug_dir, exist_ok=True)#デバッグ
+#            ts = datetime.datetime.now().strftime("%H%M%S")#デバッグ
+#            fname = f"{debug_dir}/{ts}.wav"#デバッグ
+#            with open(fname, "wb") as f:#デバッグ
+
                 f.write(audio_content)
                 tmp_16k = f.name
 
@@ -92,10 +99,10 @@ class SpeechService:
             return None
         finally:
             # 必ず一時ファイルを削除
-            for f in [tmp_16k]:
-                if f and os.path.exists(f):
-                    os.unlink(f)
-                
+            for f in [tmp_16k]:#
+                if f and os.path.exists(f):#
+                    os.unlink(f)#
+#                pass #デバッグ
 
 # グローバルインスタンス
 speech_service = SpeechService()
