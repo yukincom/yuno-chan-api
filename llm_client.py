@@ -72,9 +72,9 @@ def call_search(prompt: str) -> str:
 
 
 def call_summary(prompt: str) -> str:
-    """要約生成。AI_PROVIDERで切り替え"""
-    print(f"[LLM] 📝 summary provider={config.AI_PROVIDER} model={config.AI_SUMMARY_MODEL}")
-    if config.AI_PROVIDER == "gemini":
+    """要約生成。AI_SUMMARY_PROVIDERで切り替え（デフォルトはgemini）"""
+    print(f"[LLM] 📝 summary provider={config.AI_SUMMARY_PROVIDER} model={config.AI_SUMMARY_MODEL}")
+    if config.AI_SUMMARY_PROVIDER == "gemini":
         return _call_gemini(
             prompt,
             model=config.AI_SUMMARY_MODEL,
@@ -87,9 +87,8 @@ def call_summary(prompt: str) -> str:
         temperature=config.AI_SUMMARY_TEMPERATURE
     )
 
-
 # ─────────────────────────────────────────────────────────
-# Gemini
+# Gemini SDK
 # ─────────────────────────────────────────────────────────
 
 def _call_gemini(prompt: str, model: str, temperature: float, use_search: bool) -> str:

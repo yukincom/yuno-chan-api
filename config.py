@@ -14,9 +14,11 @@ class Config:
     """アプリケーション設定"""
     # AI モデル設定
     AI_PROVIDER      = os.getenv("AI_PROVIDER", "gemini")
-
     AI_CHAT_MODEL    = os.getenv("AI_CHAT_MODEL", "gemini-2.5-flash")
+
+    AI_SUMMARY_PROVIDER = os.getenv("AI_SUMMARY_PROVIDER", os.getenv("AI_SUMMARY_PROVIDER", "gemini"))
     AI_SUMMARY_MODEL = os.getenv("AI_SUMMARY_MODEL", "gemini-2.5-flash")
+
     AI_SEARCH_MODEL  = os.getenv("AI_SEARCH_MODEL",  "gemini-2.5-flash")  # 検索（Gemini固定）
 
     SEARCH_KEYWORDS = os.getenv("SEARCH_KEYWORDS", "調べて,しらべて,調査して,ちょうさして,サーチして,さーちして,ぐぐって,ググって").split(",")

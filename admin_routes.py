@@ -198,13 +198,18 @@ AI_ENV_GROUPS = [
     {
         "group": "🔀 AIプロバイダー設定",
         "items": [
-            {"key": "AI_PROVIDER", "label": "プロバイダー", "type": "select",
+            {"key": "AI_PROVIDER", "label": "会話プロバイダー", "type": "select",
              "options": [
                  "gemini:Gemini",
                  "openai:OpenAI互換（Grok / Ollama / OpenRouter）"
              ]},
             {"key": "AI_CHAT_MODEL",    "label": "会話モデル",              "type": "text"},
-            {"key": "AI_SUMMARY_MODEL", "label": "要約モデル",              "type": "text"},
+            {"key": "AI_SUMMARY_PROVIDER", "label": "要約プロバイダー", "type": "select",
+             "options": [
+                 "gemini:Gemini",
+                 "openai:OpenAI互換（Grok / Ollama / OpenRouter）"
+             ]},                
+            {"key": "AI_SUMMARY_MODEL", "label": "要約モデル",              "type": "text"},        
             {"key": "AI_SEARCH_MODEL",  "label": "検索モデル（Gemini固定）", "type": "text"},
         ]
     },

@@ -15,7 +15,12 @@ mindcraft/
 static/
 whisper.cpp/
 voice-MCP/
-state/
+ai.js
+andy.js
+announcements.js
+env.js
+member.js
+utils.js
 
 # キャッシュ
 __pycache__/
