@@ -67,7 +67,7 @@ class Config:
     RENDER_URL = os.getenv("RENDER_URL", "")
 
     #SERVER setting
-    SERVER_PORT = int(os.getenv("SERVER_PORT", "5000"))
+    SERVER_PORT = int(os.getenv("SERVER_PORT", "5050"))
 
     # パーソナル設定
     ASSISTANT_NAME   = os.getenv("ASSISTANT_NAME", "")
