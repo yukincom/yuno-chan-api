@@ -21,6 +21,7 @@ announcements.js
 env.js
 member.js
 utils.js
+voice_server_old.py
 
 # キャッシュ
 __pycache__/
