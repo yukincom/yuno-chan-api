@@ -202,12 +202,14 @@ AI_ENV_GROUPS = [
              "options": [
                  "gemini:Gemini",
                  "openai:OpenAI互換（Grok / Ollama / OpenRouter）"
+                 "mlx:MLX"
              ]},
             {"key": "AI_CHAT_MODEL",    "label": "会話モデル",              "type": "text"},
             {"key": "AI_SUMMARY_PROVIDER", "label": "要約プロバイダー", "type": "select",
              "options": [
                  "gemini:Gemini",
                  "openai:OpenAI互換（Grok / Ollama / OpenRouter）"
+                 "mlx:MLX"
              ]},                
             {"key": "AI_SUMMARY_MODEL", "label": "要約モデル",              "type": "text"},        
             {"key": "AI_SEARCH_MODEL",  "label": "検索モデル（Gemini固定）", "type": "text"},
@@ -228,9 +230,8 @@ AI_ENV_GROUPS = [
         "items": [
             {"key": "GEMINI_API_KEY",  "label": "Gemini API キー（検索機能のため常に必須）",       "type": "password"},
             {"key": "",                      "label": "",                      "type": "empty"},
-            {"key": "OPENAI_BASE_URL", "label": "OpenAI互換 Base URL",                          "type": "text"},
-            {"key": "OPENAI_API_KEY",  "label": "OpenAI互換 API キー（AI_PROVIDER=openai の時）", "type": "password"},
-        ]
+            {"key": "OPENAI_BASE_URL", "label": "OpenAI互換 Base URL（AI_PROVIDER=openai の時）", "type": "text"},
+            {"key": "OPENAI_API_KEY",  "label": "OpenAI互換 API キー（AI_PROVIDER=openai の時）", "type": "password"},        ]
     },
     {
         "group": "🔍 検索設定",
@@ -336,3 +337,42 @@ def save_andy_env():
         return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
+    
+# ===== MLXモデル チェック / ダウンロード =====
+import threading
+from huggingface_hub import try_to_load_from_cache, snapshot_download, _CACHED_NO_EXIST
+
+_download_status = {}  # model_id → "downloading" | "done" | "error"
+
+def _is_mlx_model_cached(model_id: str) -> bool:
+    result = try_to_load_from_cache(model_id, "config.json")
+    return result is not None and result is not _CACHED_NO_EXIST
+
+@admin_bp.route("/admin/api/mlx/check")
+def mlx_check():
+    model = request.args.get("model", "").strip()
+    if not model:
+        return jsonify({"ok": False, "error": "model is empty"})
+    cached = _is_mlx_model_cached(model)
+    status = _download_status.get(model)
+    return jsonify({"ok": True, "cached": cached, "status": status})
+
+@admin_bp.route("/admin/api/mlx/download", methods=["POST"])
+def mlx_download():
+    model = (request.get_json(force=True) or {}).get("model", "").strip()
+    if not model:
+        return jsonify({"ok": False, "error": "model is empty"})
+    if _download_status.get(model) == "downloading":
+        return jsonify({"ok": True, "message": "already downloading"})
+
+    def _do_download(model_id):
+        _download_status[model_id] = "downloading"
+        try:
+            snapshot_download(repo_id=model_id)
+            _download_status[model_id] = "done"
+        except Exception as e:
+            _download_status[model_id] = "error"
+            print(f"[DOWNLOAD] ❌ {model_id}: {e}")
+
+    threading.Thread(target=_do_download, args=(model,), daemon=True).start()
+    return jsonify({"ok": True})    

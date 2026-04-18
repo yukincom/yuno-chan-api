@@ -11,6 +11,7 @@ from flask import Flask, Response, jsonify, request
 from init_files import ensure_default_files
 from config import config
 from ai_handler import is_english_mode
+from llm_client import preload_mlx_model
 from member_loader import get_family_call_map, get_primary_child, has_line_users, has_discord_users
 from services.chat_service import process_chat, detect_speaker
 from services.discord_service import _init_last_message_id
@@ -56,7 +57,8 @@ if config.DISCORD_BOT_TOKEN:
 notification_enabled = check_notification_config()  
 setup_scheduler(notification_enabled)               
 start_scheduler()
-andy_watcher.start() 
+andy_watcher.start()
+preload_mlx_model()  
 
 @app.route("/health", methods=["GET"])
 def health_check():
