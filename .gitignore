@@ -15,12 +15,9 @@ mindcraft/
 static/
 whisper.cpp/
 voice-MCP/
-ai.js
-andy.js
 announcements.js
-env.js
 member.js
-utils.js
+
 voice_server_old.py
 
 # キャッシュ
