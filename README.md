@@ -78,7 +78,7 @@ GEMINI_API_KEY=your_key_here
 
 ```bash
 python voice_server.py  # TTS サーバー（ポート5001）
-python app.py           # メインサーバー（ポート5000）
+python app.py           # メインサーバー（ポート5050）
 ```
 
 ブラウザで `http://localhost:5000/admin` を開いて残りの設定を入力。  
