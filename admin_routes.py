@@ -201,14 +201,14 @@ AI_ENV_GROUPS = [
             {"key": "AI_PROVIDER", "label": "会話プロバイダー", "type": "select",
              "options": [
                  "gemini:Gemini",
-                 "openai:OpenAI互換（Grok / Ollama / OpenRouter）"
+                 "openai:OpenAI互換（Grok / Ollama / OpenRouter）",
                  "mlx:MLX"
              ]},
             {"key": "AI_CHAT_MODEL",    "label": "会話モデル",              "type": "text"},
             {"key": "AI_SUMMARY_PROVIDER", "label": "要約プロバイダー", "type": "select",
              "options": [
                  "gemini:Gemini",
-                 "openai:OpenAI互換（Grok / Ollama / OpenRouter）"
+                 "openai:OpenAI互換（Grok / Ollama / OpenRouter）",
                  "mlx:MLX"
              ]},                
             {"key": "AI_SUMMARY_MODEL", "label": "要約モデル",              "type": "text"},        
