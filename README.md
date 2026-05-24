@@ -1,5 +1,11 @@
 # 🐥 Yuno-chan / ﾕﾉﾁｬﾝ
 
+**こちらのプロジェクトはStackChan_EX_Amigoのサーバーとして統合されました**
+
+https://github.com/yukincom/StackChan_EX_Amigo
+
+---
+
 **Talking home assistant for M5Stack — Local STT/TTS × LLM × Push-based audio**
 
 日本語・English 両対応のおしゃべりホームアシスタント。  
